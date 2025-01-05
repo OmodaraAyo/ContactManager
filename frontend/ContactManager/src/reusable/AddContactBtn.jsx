@@ -7,7 +7,7 @@ const AddContact = () => {
   const navigate = useNavigate();
 
   const navigateToAddContactPage = () =>{
-      navigate('/AddContact')
+      navigate('/addContact')
   }
   return (
     <div className={`absolute w-full h-full max-w-72 max-h-28 flex rounded-xl z-10 bottom-0 mb-4 ${showCreateAContact? 'justify-between items-start': 'justify-end items-start'}`}>
