@@ -1,20 +1,47 @@
-import React, { useState } from "react";
-import NavBar from "../component/header/NavBar";
+import React, { useEffect, useState } from "react";
 import { FaLongArrowAltLeft, FaUser, FaUserAlt } from "react-icons/fa";
 import { BiEnvelope } from "react-icons/bi";
 import { MdPhone } from "react-icons/md";
-import { useAddContactMutation } from "../service/contactApi";
 import { toast, Bounce } from "react-toastify";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
+import {
+  useGetContactByIdQuery,
+  useUpdateContactMutation,
+} from "../service/contactApi";
+import NavBar from "../component/header/NavBar";
 
-const AddContact = () => {
-  const navigate = useNavigate();
+const ContactUpdate = () => {
+  const { contactId } = useParams();
+  const [updateContact] = useUpdateContactMutation();
+  const { data: contact, isLoading } = useGetContactByIdQuery(contactId);
   const [firstName, setFirstName] = useState("");
   const [surname, setSurname] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isFocused, setIsFocused] = useState(false);
-  const [addContact, { isLoading }] = useAddContactMutation();
+  const [showSaveButton, setShowSaveButton] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (contact) {
+      setFirstName(contact.firstName || "");
+      setSurname(contact.surname || "");
+      setEmail(contact.email || "");
+      setPhoneNumber(contact.phoneNumber || "");
+    }
+  }, [contact]);
+
+  useEffect(() => {
+    if (contact) {
+      setShowSaveButton(
+        contact.firstName !== firstName ||
+          contact.surname !== surname ||
+          surname == null ||
+          contact.email !== email ||
+          contact.phoneNumber !== phoneNumber
+      );
+    }
+  }, [firstName, surname, email, phoneNumber, contact, showSaveButton]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,15 +54,15 @@ const AddContact = () => {
     };
 
     try {
-      const response =  await addContact(contactData).unwrap();
-      const contactId = response.id;
-      navigate(`/contactDetails/${contactId}`);
-      toast.success("Contact saved succesfully", {
+      const response = await updateContact({ contactId, contactData }).unwrap();
+      const updatedContactId = response.id;
+      navigate(`/contactDetails/${updatedContactId}`);
+      toast.success("Contact updated succesfully", {
         position: "bottom-right",
         autoClose: 1000,
         hideProgressBar: true,
         closeOnClick: true,
-        pauseOnHover: true,
+        pauseOnHover: false,
         draggable: false,
         progress: undefined,
         theme: "colored",
@@ -47,6 +74,7 @@ const AddContact = () => {
       setEmail("");
       setPhoneNumber("");
     } catch (error) {
+      console.log("from add contact error:", error);
       toast.error(`Failed to add contact: ${error.data.message}`, {
         position: "bottom-right",
         autoClose: 1000,
@@ -62,33 +90,35 @@ const AddContact = () => {
   };
 
   const navigateToHome = () => {
-    navigate('/')
-  }
+    navigate("/");
+  };
 
   return (
     <div className="addContact-Container">
       <div className="sticky top-0 z-10">
-        <NavBar />
-        <div className="w-full bg-white">
-          <div className="container px-5 sm:px-1 mx-auto py-2 flex justify-between items-center text-lg md:text-xl bg-transparent">
-          <button onClick={() => navigateToHome()}><FaLongArrowAltLeft className="text-xl text-slate-900"/></button>
+        <NavBar isSearchDisabled={true}/>
+        <div className="container px-5 sm:px-1 mx-auto py-2 flex justify-between items-center text-lg md:text-xl bg-white">
+          <button onClick={() => navigateToHome()}>
+            <FaLongArrowAltLeft className="text-xl text-slate-900" />
+          </button>
           <button
             onClick={handleSubmit}
             form="a-form"
             type="button"
-            className="save-button bg-blue-800 px-7 py-2 rounded-full text-white"
-            disabled={isLoading}
+            className={`save-button px-7 py-2 rounded-full text-white cursor-pointer ${
+              showSaveButton ? "bg-blue-800" : "bg-gray-300"
+            }`}
+            disabled={isLoading || !showSaveButton}
           >
             <h2>Save</h2>
           </button>
-          </div>
         </div>
       </div>
-      <div className="contact-image-container flex w-full justify-center items-center py-12 ">
+      <div className="contact-image-container flex justify-end justify-self-center py-12 ">
         <button className="bg-blue-100 w-[12rem] h-[12rem] rounded-full flex justify-center items-center overflow-hidden">
           <FaUser className="text-blue-300 text-[11rem] mt-6" />
         </button>
-        <div className="absolute mt-28 ml-28">
+        <div className="absolute mt-28 ml-">
           <div className="w-20 h-20 bg-white rounded-full absolute"></div>
           <button className="w-16 h-16 bg-blue-800 rounded-full relative mt-2 ml-2">
             <h2 className="text-3xl text-white mb-1">+</h2>
@@ -164,4 +194,4 @@ const AddContact = () => {
   );
 };
 
-export default AddContact;
+export default ContactUpdate;

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {"https://contactsmgr.netlify.app", "http://localhost:5173"})
 @RequestMapping("/api/contact")
 public class ContactController {
 
@@ -32,11 +32,16 @@ public class ContactController {
 
     @GetMapping("/getContactByFirstName")
     public List<ContactResponse> getContactsByFirstName(@RequestParam(defaultValue = "Unknown") String firstName) {
-        return contactService.fetchContactsByName(firstName);
+        return contactService.findByFirstName(firstName);
     }
     @GetMapping("/getContactBySurname")
     public List<ContactResponse> getContactsBySurname(@RequestParam(defaultValue = "Unknown") String surname) {
         return contactService.fetchContactsByName(surname);
+    }
+
+    @GetMapping("/getContactByCharacter")
+    public List<ContactResponse> getContactsByCharacter(@RequestParam(defaultValue = "^") String character) {
+        return contactService.findContactByAlphabet(character);
     }
     @GetMapping("/getContactByFullName")
     public List<ContactResponse> getContactByFullName(@RequestParam(defaultValue = "Unknown") String fullName) {

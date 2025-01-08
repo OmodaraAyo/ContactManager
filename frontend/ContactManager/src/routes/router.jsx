@@ -1,6 +1,7 @@
 import Layout from "../layout/Layout"
 import AddContact from "../pages/AddContact"
 import ContactDetails from "../pages/contactDetails/ContactDetails"
+import ContactUpdate from "../pages/ContactUpdate"
 
 
 const ROUTES = [
@@ -15,6 +16,10 @@ const ROUTES = [
     {
         path: "/contactDetails/:contactId",
         element: <ContactDetails/>
+    },
+    {
+        path: "/updateContact/:contactId",
+        element: <ContactUpdate/>
     },
     
 ]

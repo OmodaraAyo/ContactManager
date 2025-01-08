@@ -12,4 +12,5 @@ public interface ContactService {
     ContactResponse updateContact(String id, ContactRequest contactRequest);
     ContactResponse deleteById(String id);
     ContactResponse findAllContacts();
+    List<ContactResponse> findContactByAlphabet(String alphabet);
 }

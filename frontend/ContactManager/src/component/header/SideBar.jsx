@@ -1,20 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FaLongArrowAltLeft, FaTrashAlt, FaUser } from "react-icons/fa";
 
-const SideBar = ({ setShowSideBar }) => {
+const SideBar = ({ setShowSideBar, setShowSearchButton }) => {
   const handleCloseSideBar = () => {
     setShowSideBar(false);
   };
+
+  useEffect(()=>{
+    setShowSearchButton? setShowSearchButton(false): setShowSearchButton(false)
+  }, [setShowSearchButton]);
+  
   return (
     <div
-      className={`absolute w-full h-screen max-w-64 bg-slate-900 bg-opacity-100 transition-transform duration-[5000ms] ease-in-out z-10 text-white ${
+      className={`absolute w-full h-screen max-w-64 md:max-w-80 bg-slate-900 bg-opacity-100 transition-transform duration-[5000ms] ease-in-out z-50 text-white ${
         setShowSideBar
           ? "transform translate-x-0"
           : "transform -translate-x-full"
       }`}
     >
       <div className="bg-slate-800 w-full h-screen bg-opacity-70 absolute -z-20"></div>
-      <div className="flex justify-self-end px-5 py-7">
+      <div className="flex justify-self-end justify-end items-end px-5 py-7">
         <button onClick={handleCloseSideBar} className="border px-2 py-2 rounded-lg shadow-md shadow-slate-900">
           <FaLongArrowAltLeft className="text-white text-2xl" />
         </button>

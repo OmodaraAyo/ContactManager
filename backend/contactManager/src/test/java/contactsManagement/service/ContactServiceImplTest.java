@@ -27,7 +27,7 @@ public class ContactServiceImplTest {
         contactsRepository.deleteAll();
         ContactRequest contactRequest = new ContactRequest();
         contactRequest.setFirstName("DAVID");
-        contactRequest.setSurname("SUNNY");
+        contactRequest.setSurname("SuNNY");
         contactRequest.setEmail("johnmark@Gmail.com");
         contactRequest.setPhoneNumber("12345678911");
         contactService.addContact(contactRequest);
@@ -37,12 +37,12 @@ public class ContactServiceImplTest {
     public void testToFind_Saved_ContactById(){
         assertEquals(1, contactsRepository.count());
         ContactRequest contactRequest2 = new ContactRequest();
-        contactRequest2.setFirstName("DAVID");
-        contactRequest2.setSurname("SUNNY");
+        contactRequest2.setFirstName("Benson");
+        contactRequest2.setSurname("johnson");
         contactRequest2.setEmail("johnmark@Gmail.com");
         contactRequest2.setPhoneNumber("12345678911");
         ContactResponse savedContact = contactService.addContact(contactRequest2);
-        assertEquals("DAVID", contactService.findById(savedContact.getId()).getFirstName());
+        assertEquals("Benson", contactService.findById(savedContact.getId()).getFirstName());
     }
 
     @Test
@@ -109,7 +109,7 @@ public class ContactServiceImplTest {
         List<ContactResponse> actual = contactService.fetchContactsByName("MARK");
         assertEquals(expected.size(), actual.size());
         for(ContactResponse contact : actual){
-            assertEquals("MARK", contact.getSurName());
+            assertEquals("MARK", contact.getSurname());
         }
     }
 
@@ -145,9 +145,9 @@ public class ContactServiceImplTest {
     public void testToUpdate_A_Saved_ContactById(){
         assertEquals(1, contactsRepository.count());
         ContactRequest contactRequest2 = new ContactRequest();
-        contactRequest2.setFirstName("DAVID");
-        contactRequest2.setSurname("SUNNY");
-        contactRequest2.setEmail("johnmark@gmail.com");
+        contactRequest2.setFirstName("Ayo");
+        contactRequest2.setSurname("Maff");
+        contactRequest2.setEmail("AyoMaff@gmail.com");
         contactRequest2.setPhoneNumber("09123456789");
         ContactResponse savedContact =  contactService.addContact(contactRequest2);
         assertEquals(2, contactsRepository.count());
@@ -156,11 +156,11 @@ public class ContactServiceImplTest {
         ContactRequest contactRequest3 = new ContactRequest();
         contactRequest3.setFirstName("Emma");
         contactRequest3.setSurname("Wednesday");
-        contactRequest3.setEmail("johnmark@gmail.com");
+        contactRequest3.setEmail("emmawednesday@gmail.com");
         contactRequest3.setPhoneNumber("09123456789");
         contactService.updateContact(updateId, contactRequest3);
         assertEquals(2, contactsRepository.count());
-        assertEquals("WEDNESDAY", contactsRepository.findById(updateId).orElseThrow(()-> new RuntimeException("Contact not found")).getSurname());
+        assertEquals("Wednesday", contactsRepository.findById(updateId).orElseThrow(()-> new RuntimeException("Contact not found")).getSurname());
     }
 
     @Test
@@ -213,7 +213,7 @@ public class ContactServiceImplTest {
         contactRequest2.setEmail("AyodeleBenson@gmail.com");
         contactRequest2.setPhoneNumber("234123456697");
         RuntimeException exception = assertThrows(RuntimeException.class, ()-> contactService.addContact(contactRequest2));
-        assertEquals(exception.getMessage(), "FirstName is required");
+        assertEquals(exception.getMessage(), "First name is required");
         assertEquals(1, contactsRepository.count());
     }
 
@@ -226,7 +226,7 @@ public class ContactServiceImplTest {
         contactRequest2.setPhoneNumber("234123456697");
         ContactResponse savedContact = contactService.addContact(contactRequest2);
         assertEquals(2, contactsRepository.count());
-        assertEquals("BENSON", contactService.findById(savedContact.getId()).getFirstName());
+        assertEquals("Benson", contactService.findById(savedContact.getId()).getFirstName());
         assertEquals(2, contactsRepository.count());
         RuntimeException exception = assertThrows(RuntimeException.class, ()-> contactService.fetchContactsByName(""));
         assertEquals(exception.getMessage(), "Contact not found");
@@ -252,7 +252,45 @@ public class ContactServiceImplTest {
         contactRequest2.setSurname("Benson");
         contactRequest2.setEmail("Ayodele@gmail.com");
         RuntimeException exception = assertThrows(RuntimeException.class, ()-> contactService.addContact(contactRequest2));
-        assertEquals(exception.getMessage(), "PhoneNumber is required");
+        assertEquals(exception.getMessage(), "Phone number is required");
         assertEquals(1, contactsRepository.count());
+    }
+
+    @Test
+    public void testThatIfContactTo_Save_Already_Exist_An_Exception_Is_Thrown(){
+        assertEquals(1, contactsRepository.count());
+        ContactRequest contactRequest2 = new ContactRequest();
+        contactRequest2.setFirstName("DAVID");
+        contactRequest2.setSurname("SuNNY");
+        contactRequest2.setEmail("johnmark@Gmail.com");
+        contactRequest2.setPhoneNumber("12345678911");
+        RuntimeException exception = assertThrows(RuntimeException.class, ()-> contactService.addContact(contactRequest2));
+        assertEquals(exception.getMessage(), "Contact with name already exist");
+    }
+
+    @Test
+    public void testToFindContactByAlphabet(){
+        assertEquals(1, contactsRepository.count());
+        ContactRequest contactRequest2 = new ContactRequest();
+        contactRequest2.setFirstName("Ayodele");
+        contactRequest2.setSurname("Benson");
+        contactRequest2.setEmail("AyodeleBenson@gmail.com");
+        contactRequest2.setPhoneNumber("234123456697");
+        contactService.addContact(contactRequest2);
+        assertEquals(2, contactsRepository.count());
+
+        ContactRequest contactRequest3 = new ContactRequest();
+        contactRequest3.setFirstName("John");
+        contactRequest3.setSurname("Savage");
+        contactRequest3.setEmail("savage21@gmail.com");
+        contactRequest3.setPhoneNumber("090235477929");
+        contactService.addContact(contactRequest3);
+        assertEquals(3, contactsRepository.count());
+
+        List<ContactResponse> matchedContact = contactService.findContactByAlphabet("av");
+        System.out.println(matchedContact);
+        for(ContactResponse contactResponse: matchedContact){
+            assertTrue(contactResponse.getFullName().toLowerCase().contains("a"));
+        }
     }
 }
